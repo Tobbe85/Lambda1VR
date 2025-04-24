@@ -1,4 +1,4 @@
-rootProject.projectDir = new File(settingsDir, '../..')
 rootProject.name = "Lambda1VR"
-
-include ':', 'Projects:Android'
+include ':Lambda1VR', ':Projects:Android'
+project(':Lambda1VR').projectDir = new File(rootDir, 'Lambda1VR')
+project(':Projects:Android').projectDir = new File(rootDir, 'Projects/Android')
