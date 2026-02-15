@@ -18,11 +18,14 @@
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
 		tools:ignore="AllFilesAccessPolicy,ScopedStorage" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
 
 	<application android:allowBackup="false"
 		android:icon="@drawable/ic_lambda1vr"
 		android:label="@string/lambda1vr"
+		android:requestLegacyExternalStorage="true"
 		android:extractNativeLibs="true"	>
 
 		<meta-data android:name="com.samsung.android.vr.application.mode" android:value="vr_only"/>
