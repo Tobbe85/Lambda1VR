@@ -103,6 +103,7 @@ enum ConfigsSetEXT
 const char* const requiredExtensionNames_pico[] = {
 		XR_KHR_ANDROID_CREATE_INSTANCE_EXTENSION_NAME,
 		XR_EXT_PERFORMANCE_SETTINGS_EXTENSION_NAME,
+        XR_FB_DISPLAY_REFRESH_RATE_EXTENSION_NAME,
 		XR_KHR_OPENGL_ES_ENABLE_EXTENSION_NAME};
 
 
@@ -1389,6 +1390,44 @@ void TBXR_InitRenderer(  ) {
 	OXR(xrGetViewConfigurationProperties(
 			gAppState.Instance, gAppState.SystemId, XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO, &gAppState.ViewportConfig));
 
+    // Enumerate the supported color space options for the system.
+    PFN_xrEnumerateDisplayRefreshRatesFB pfnxrEnumerateDisplayRefreshRatesFB = NULL;
+    OXR(xrGetInstanceProcAddr(
+            gAppState.Instance,
+            "xrEnumerateDisplayRefreshRatesFB",
+            (PFN_xrVoidFunction*)(&pfnxrEnumerateDisplayRefreshRatesFB)));
+
+    OXR(pfnxrEnumerateDisplayRefreshRatesFB(
+            gAppState.Session, 0, &gAppState.NumSupportedDisplayRefreshRates, NULL));
+
+    gAppState.SupportedDisplayRefreshRates =
+            (float*)malloc(gAppState.NumSupportedDisplayRefreshRates * sizeof(float));
+    OXR(pfnxrEnumerateDisplayRefreshRatesFB(
+            gAppState.Session,
+            gAppState.NumSupportedDisplayRefreshRates,
+            &gAppState.NumSupportedDisplayRefreshRates,
+            gAppState.SupportedDisplayRefreshRates));
+    ALOGV("Supported Refresh Rates:");
+    for (uint32_t i = 0; i < gAppState.NumSupportedDisplayRefreshRates; i++) {
+        ALOGV("%d:%f", i, gAppState.SupportedDisplayRefreshRates[i]);
+    }
+
+    OXR(xrGetInstanceProcAddr(
+            gAppState.Instance,
+            "xrGetDisplayRefreshRateFB",
+            (PFN_xrVoidFunction*)(&gAppState.pfnGetDisplayRefreshRate)));
+
+    OXR(gAppState.pfnGetDisplayRefreshRate(gAppState.Session, &gAppState.currentDisplayRefreshRate));
+    ALOGV("Current System Display Refresh Rate: %f", gAppState.currentDisplayRefreshRate);
+
+    OXR(xrGetInstanceProcAddr(
+            gAppState.Instance,
+            "xrRequestDisplayRefreshRateFB",
+            (PFN_xrVoidFunction*)(&gAppState.pfnRequestDisplayRefreshRate)));
+
+    // Test requesting the system default.
+    OXR(gAppState.pfnRequestDisplayRefreshRate(gAppState.Session, 0.0f));
+    ALOGV("Requesting system default display refresh rate");
 
     if (strstr(gAppState.OpenXRHMD, "meta") != NULL)
     {
@@ -1400,7 +1439,6 @@ void TBXR_InitRenderer(  ) {
         systemProperties.next = &colorSpacePropertiesFB;
         OXR(xrGetSystemProperties(gAppState.Instance, gAppState.SystemId, &systemProperties));
 
-        // Enumerate the supported color space options for the system.
         {
             PFN_xrEnumerateColorSpacesFB pfnxrEnumerateColorSpacesFB = NULL;
             OXR(xrGetInstanceProcAddr(
@@ -1434,45 +1472,6 @@ void TBXR_InitRenderer(  ) {
         }
 
         // Get the supported display refresh rates for the system.
-        {
-            PFN_xrEnumerateDisplayRefreshRatesFB pfnxrEnumerateDisplayRefreshRatesFB = NULL;
-            OXR(xrGetInstanceProcAddr(
-                    gAppState.Instance,
-                    "xrEnumerateDisplayRefreshRatesFB",
-                    (PFN_xrVoidFunction*)(&pfnxrEnumerateDisplayRefreshRatesFB)));
-
-            OXR(pfnxrEnumerateDisplayRefreshRatesFB(
-                    gAppState.Session, 0, &gAppState.NumSupportedDisplayRefreshRates, NULL));
-
-            gAppState.SupportedDisplayRefreshRates =
-                    (float*)malloc(gAppState.NumSupportedDisplayRefreshRates * sizeof(float));
-            OXR(pfnxrEnumerateDisplayRefreshRatesFB(
-                    gAppState.Session,
-                    gAppState.NumSupportedDisplayRefreshRates,
-                    &gAppState.NumSupportedDisplayRefreshRates,
-                    gAppState.SupportedDisplayRefreshRates));
-            ALOGV("Supported Refresh Rates:");
-            for (uint32_t i = 0; i < gAppState.NumSupportedDisplayRefreshRates; i++) {
-                ALOGV("%d:%f", i, gAppState.SupportedDisplayRefreshRates[i]);
-            }
-
-            OXR(xrGetInstanceProcAddr(
-                    gAppState.Instance,
-                    "xrGetDisplayRefreshRateFB",
-                    (PFN_xrVoidFunction*)(&gAppState.pfnGetDisplayRefreshRate)));
-
-            OXR(gAppState.pfnGetDisplayRefreshRate(gAppState.Session, &gAppState.currentDisplayRefreshRate));
-            ALOGV("Current System Display Refresh Rate: %f", gAppState.currentDisplayRefreshRate);
-
-            OXR(xrGetInstanceProcAddr(
-                    gAppState.Instance,
-                    "xrRequestDisplayRefreshRateFB",
-                    (PFN_xrVoidFunction*)(&gAppState.pfnRequestDisplayRefreshRate)));
-
-            // Test requesting the system default.
-            OXR(gAppState.pfnRequestDisplayRefreshRate(gAppState.Session, 0.0f));
-            ALOGV("Requesting system default display refresh rate");
-        }
     }
 
 	uint32_t numOutputSpaces = 0;

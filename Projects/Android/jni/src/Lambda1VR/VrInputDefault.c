@@ -465,11 +465,11 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 			static bool weaponSwitched = false;
 			if (vr_turn_angle->value != 0) // if snap angle feature is enabled
 			{
-				if (between(0.6f, pDominantTrackedRemoteNew->Joystick.y, 1.0f) ||
-						between(-1.0f, pDominantTrackedRemoteNew->Joystick.y, -0.6f))
+				if (between(0.8f, pDominantTrackedRemoteNew->Joystick.y, 1.0f) ||
+						between(-1.0f, pDominantTrackedRemoteNew->Joystick.y, -0.8f))
 				{
 					if (!weaponSwitched) {
-						if (between(0.6f, pDominantTrackedRemoteNew->Joystick.y, 1.0f))
+						if (between(0.8f, pDominantTrackedRemoteNew->Joystick.y, 1.0f))
 						{
 							sendButtonActionSimple("invprev");
 						}
@@ -486,27 +486,27 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 			}
 			else // allow slot selection (columns of weapon hud)
 			{
-				if (between(0.6f, pDominantTrackedRemoteNew->Joystick.y, 1.0f) ||
-					between(-1.0f, pDominantTrackedRemoteNew->Joystick.y, -0.6f) ||
-					between(0.6f, pDominantTrackedRemoteNew->Joystick.x, 1.0f) ||
-					between(-1.0f, pDominantTrackedRemoteNew->Joystick.x, -0.6f))
+				if (between(0.8f, pDominantTrackedRemoteNew->Joystick.y, 1.0f) ||
+					between(-1.0f, pDominantTrackedRemoteNew->Joystick.y, -0.8f) ||
+					between(0.8f, pDominantTrackedRemoteNew->Joystick.x, 1.0f) ||
+					between(-1.0f, pDominantTrackedRemoteNew->Joystick.x, -0.8f))
 				{
 					if (!weaponSwitched) {
 						if (!weaponSwitched)
 						{
-							if (between(0.6f, pDominantTrackedRemoteNew->Joystick.y, 1.0f))
+							if (between(0.8f, pDominantTrackedRemoteNew->Joystick.y, 1.0f))
 							{
 								sendButtonActionSimple("invnext"); // in this mode is makes more sense to select the next item with Joystick down; this is the mouse wheel behaviour in hl
 							}
-							else if (between(-1.0f, pDominantTrackedRemoteNew->Joystick.y, -0.6f))
+							else if (between(-1.0f, pDominantTrackedRemoteNew->Joystick.y, -0.8f))
 							{
 								sendButtonActionSimple("invprev");
 							}
-							else if (between(0.6f, pDominantTrackedRemoteNew->Joystick.x, 1.0f))
+							else if (between(0.8f, pDominantTrackedRemoteNew->Joystick.x, 1.0f))
 							{
 								sendButtonActionSimple("invprevslot"); // not an original hl methode -> needs update from hlsdk-xash3d
 							}
-							else if (between(-1.0f, pDominantTrackedRemoteNew->Joystick.x, -0.6f))
+							else if (between(-1.0f, pDominantTrackedRemoteNew->Joystick.x, -0.8f))
 							{
 								sendButtonActionSimple("invnextslot");
 							}
